@@ -579,23 +579,42 @@ function MarioKartBg() {
 }
 
 // ── Star central ─────────────────────────────
-function StarSVG({ hovered = false }) {
+function StarSVG({ hovered=false, smiling=false, spinning=false }) {
   const pts = Array.from({length:5},(_,i)=>{
     const o=46,inn=20;
     const a1=Math.PI/2+(i*2*Math.PI)/5,a2=a1+Math.PI/5;
     return `${50+o*Math.cos(a1)},${50-o*Math.sin(a1)} ${50+inn*Math.cos(a2)},${50-inn*Math.sin(a2)}`;
   }).join(" ");
 
-  // Ojos normales vs hover (sorpresa: pupils arriba, boca abierta)
-  const eyeL  = hovered ? {cx:37, cy:43, rx:7,   ry:8.5} : {cx:37, cy:46, rx:6.5, ry:7};
-  const eyeR  = hovered ? {cx:63, cy:43, rx:7,   ry:8.5} : {cx:63, cy:46, rx:6.5, ry:7};
-  const pupL  = hovered ? {cx:36, cy:40, rx:3,   ry:3.5} : {cx:38.5,cy:47.5,rx:3.5,ry:4};
-  const pupR  = hovered ? {cx:62, cy:40, rx:3,   ry:3.5} : {cx:64.5,cy:47.5,rx:3.5,ry:4};
-  const shine1= hovered ? {cx:37.5,cy:38.5,r:1.2} : {cx:40,cy:45.5,r:1.2};
-  const shine2= hovered ? {cx:63.5,cy:38.5,r:1.2} : {cx:66,cy:45.5,r:1.2};
-  const mouth = hovered
-    ? "M 40 60 Q 50 70 60 60"    // boca muy abierta sorpresa
-    : "M 41 57 Q 50 63 59 57";   // sonrisa normal
+  // ── estados de cara ──────────────────────────────────
+  // smiling: gran sonrisa con ojos entrecerrados de felicidad
+  // hovered: sorpresa (pupilas arriba, cejas altas, boca abierta)
+  // spinning: ojos mareados (espirales simuladas)
+  // normal: cara tranquila
+
+  const eyeL   = (hovered&&!smiling) ? {cx:37,cy:43,rx:7,  ry:8.5}  : {cx:37,cy:46,rx:6.5,ry:7};
+  const eyeR   = (hovered&&!smiling) ? {cx:63,cy:43,rx:7,  ry:8.5}  : {cx:63,cy:46,rx:6.5,ry:7};
+  const pupL   = (hovered&&!smiling) ? {cx:36,cy:40,rx:3,  ry:3.5}  : {cx:38.5,cy:47.5,rx:3.5,ry:4};
+  const pupR   = (hovered&&!smiling) ? {cx:62,cy:40,rx:3,  ry:3.5}  : {cx:64.5,cy:47.5,rx:3.5,ry:4};
+  const shine1 = (hovered&&!smiling) ? {cx:37.5,cy:38.5,r:1.2}      : {cx:40,cy:45.5,r:1.2};
+  const shine2 = (hovered&&!smiling) ? {cx:63.5,cy:38.5,r:1.2}      : {cx:66,cy:45.5,r:1.2};
+
+  const mouthPath = smiling
+    ? "M 33 56 Q 50 72 67 56"          // sonrisa enorme post-peonza
+    : (hovered&&!smiling)
+      ? "M 40 60 Q 50 70 60 60"        // boca abierta sorpresa
+      : "M 41 57 Q 50 63 59 57";       // sonrisa normal
+
+  const cheekSize  = smiling ? 7 : (hovered&&!smiling) ? 6 : 4;
+  const cheekOpacity = smiling ? 0.75 : (hovered&&!smiling) ? 0.65 : 0.4;
+
+  // ojos entrecerrados al sonreír post-spin
+  const eyeClosedL = "M 30 46 Q 37 40 44 46";
+  const eyeClosedR = "M 56 46 Q 63 40 70 46";
+
+  const gradStart = smiling ? "#ffffff" : (hovered&&!smiling) ? "#ffffff" : "#FFE600";
+  const gradMid   = smiling ? "#FFE600" : (hovered&&!smiling) ? "#FFE600" : "#FF8C00";
+  const gradEnd   = smiling ? "#FF8C00" : (hovered&&!smiling) ? "#FF8C00" : "#FF003C";
 
   return (
     <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"
@@ -606,99 +625,148 @@ function StarSVG({ hovered = false }) {
           <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
         <filter id="sGlowBig" x="-80%" y="-80%" width="260%" height="260%">
-          <feGaussianBlur stdDeviation={hovered ? "6" : "2.5"} result="b"/>
+          <feGaussianBlur stdDeviation={hovered||smiling ? "6" : "2.5"} result="b"/>
           <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
         <radialGradient id="sGrad" cx="50%" cy="38%" r="62%">
-          <stop offset="0%"   stopColor={hovered ? "#ffffff" : "#FFE600"}/>
-          <stop offset="42%"  stopColor={hovered ? "#FFE600" : "#FF8C00"}/>
-          <stop offset="100%" stopColor={hovered ? "#FF8C00" : "#FF003C"}/>
+          <stop offset="0%"   stopColor={gradStart}/>
+          <stop offset="42%"  stopColor={gradMid}/>
+          <stop offset="100%" stopColor={gradEnd}/>
         </radialGradient>
       </defs>
-      {/* Halo extra en hover */}
-      {hovered && <circle cx="50" cy="50" r="52" fill="#FFE600" opacity="0.12"/>}
-      {hovered && <circle cx="50" cy="50" r="48" fill="#FFE600" opacity="0.08"/>}
+
+      {/* Halos */}
+      {(hovered||smiling||spinning) && <circle cx="50" cy="50" r="54" fill="#FFE600" opacity="0.1"/>}
+      {(smiling||spinning) && <circle cx="50" cy="50" r="50" fill="#FFE600" opacity="0.12"/>}
       <circle cx="50" cy="50" r="48" fill="none" stroke="#FFE600" strokeWidth="0.5" opacity="0.2"/>
+
+      {/* Cuerpo estrella */}
       <polygon points={pts} fill="url(#sGrad)" filter="url(#sGlowBig)"/>
       <polygon points={pts} fill="none" stroke="#FFE600" strokeWidth="0.7" opacity="0.6"/>
 
-      {/* Ojos — transición suave */}
-      <ellipse style={{transition:"all .15s"}} cx={eyeL.cx} cy={eyeL.cy} rx={eyeL.rx} ry={eyeL.ry} fill="white"/>
-      <ellipse style={{transition:"all .15s"}} cx={eyeR.cx} cy={eyeR.cy} rx={eyeR.rx} ry={eyeR.ry} fill="white"/>
-      <ellipse style={{transition:"all .15s"}} cx={pupL.cx} cy={pupL.cy} rx={pupL.rx} ry={pupL.ry} fill="#111"/>
-      <ellipse style={{transition:"all .15s"}} cx={pupR.cx} cy={pupR.cy} rx={pupR.rx} ry={pupR.ry} fill="#111"/>
-      <circle style={{transition:"all .15s"}} cx={shine1.cx} cy={shine1.cy} r={shine1.r} fill="white" opacity="0.9"/>
-      <circle style={{transition:"all .15s"}} cx={shine2.cx} cy={shine2.cy} r={shine2.r} fill="white" opacity="0.9"/>
+      {/* ── CARA SONRIENTE (post-peonza) ── */}
+      {smiling && <>
+        {/* Ojos entrecerrados felices */}
+        <path d={eyeClosedL} fill="none" stroke="#111" strokeWidth="2.8" strokeLinecap="round"/>
+        <path d={eyeClosedR} fill="none" stroke="#111" strokeWidth="2.8" strokeLinecap="round"/>
+        {/* Sonrisa enorme */}
+        <path d={mouthPath} fill="#111" stroke="none"/>
+        {/* Dientes */}
+        <path d="M 33 56 Q 50 72 67 56 L 65 58 Q 50 68 35 58 Z" fill="white" opacity="0.9"/>
+        {/* Estrellitas de felicidad */}
+        {[{x:20,y:28},{x:78,y:25},{x:15,y:60},{x:83,y:58},{x:50,y:10}].map((s,i)=>(
+          <polygon key={i} points={Array.from({length:5},(_,j)=>{
+            const r1=4,r2=1.8,a1=Math.PI/2+(j*2*Math.PI)/5,a2=a1+Math.PI/5;
+            return `${s.x+r1*Math.cos(a1)},${s.y-r1*Math.sin(a1)} ${s.x+r2*Math.cos(a2)},${s.y-r2*Math.sin(a2)}`;
+          }).join(" ")} fill="#FFE600" opacity="0.95"/>
+        ))}
+        {/* Notas musicales */}
+        <text x="22" y="22" fontSize="8" fill="#FFE600" opacity="0.9">♪</text>
+        <text x="72" y="20" fontSize="9" fill="#FFE600" opacity="0.9">♫</text>
+      </>}
 
-      {/* Cejas — se levantan en hover (sorpresa) */}
-      {hovered ? (
-        <>
-          <path d="M 30 36 Q 37 31 44 34" fill="none" stroke="#111" strokeWidth="1.4" strokeLinecap="round"/>
-          <path d="M 56 34 Q 63 31 70 36" fill="none" stroke="#111" strokeWidth="1.4" strokeLinecap="round"/>
-        </>
-      ) : (
-        <>
-          <line x1="31" y1="41" x2="33" y2="39.5" stroke="#111" strokeWidth="0.8"/>
-          <line x1="34" y1="39.5" x2="35" y2="37.8" stroke="#111" strokeWidth="0.8"/>
-          <line x1="37" y1="39"   x2="37" y2="37"   stroke="#111" strokeWidth="0.8"/>
-          <line x1="40" y1="39.5" x2="41.5" y2="38" stroke="#111" strokeWidth="0.8"/>
-          <line x1="43" y1="41"   x2="44.5" y2="39.8" stroke="#111" strokeWidth="0.8"/>
-          <line x1="57" y1="41"   x2="55.5" y2="39.8" stroke="#111" strokeWidth="0.8"/>
-          <line x1="60" y1="39.5" x2="58.5" y2="38"   stroke="#111" strokeWidth="0.8"/>
-          <line x1="63" y1="39"   x2="63"   y2="37"   stroke="#111" strokeWidth="0.8"/>
-          <line x1="66" y1="39.5" x2="67"   y2="37.8" stroke="#111" strokeWidth="0.8"/>
-          <line x1="69" y1="41"   x2="71"   y2="39.5" stroke="#111" strokeWidth="0.8"/>
-        </>
-      )}
+      {/* ── CARA GIRANDO (ojos de espiral/mareo) ── */}
+      {spinning && !smiling && <>
+        {/* Ojos como espirales (simuladas con círculos concéntricos) */}
+        <circle cx="37" cy="46" r="7" fill="white"/>
+        <circle cx="63" cy="46" r="7" fill="white"/>
+        <circle cx="37" cy="46" r="5" fill="none" stroke="#111" strokeWidth="1.2"/>
+        <circle cx="37" cy="46" r="3" fill="none" stroke="#111" strokeWidth="1"/>
+        <circle cx="37" cy="46" r="1.2" fill="#111"/>
+        <circle cx="63" cy="46" r="5" fill="none" stroke="#111" strokeWidth="1.2"/>
+        <circle cx="63" cy="46" r="3" fill="none" stroke="#111" strokeWidth="1"/>
+        <circle cx="63" cy="46" r="1.2" fill="#111"/>
+        {/* Boca mareada */}
+        <path d="M 38 58 Q 44 54 50 58 Q 56 62 62 58" fill="none" stroke="#111" strokeWidth="2" strokeLinecap="round"/>
+      </>}
 
-      {/* Boca */}
-      <path style={{transition:"all .2s"}} d={mouth} fill={hovered?"#111":"none"}
-        stroke={hovered?"none":"#111"} strokeWidth="1.8" strokeLinecap="round"/>
-      {hovered && <ellipse cx="50" cy="64" rx="5" ry="4" fill="#FF4444" opacity="0.7"/>}
+      {/* ── CARA NORMAL / HOVER ── */}
+      {!smiling && !spinning && <>
+        <ellipse style={{transition:"all .15s"}} cx={eyeL.cx} cy={eyeL.cy} rx={eyeL.rx} ry={eyeL.ry} fill="white"/>
+        <ellipse style={{transition:"all .15s"}} cx={eyeR.cx} cy={eyeR.cy} rx={eyeR.rx} ry={eyeR.ry} fill="white"/>
+        <ellipse style={{transition:"all .15s"}} cx={pupL.cx} cy={pupL.cy} rx={pupL.rx} ry={pupL.ry} fill="#111"/>
+        <ellipse style={{transition:"all .15s"}} cx={pupR.cx} cy={pupR.cy} rx={pupR.rx} ry={pupR.ry} fill="#111"/>
+        <circle style={{transition:"all .15s"}} cx={shine1.cx} cy={shine1.cy} r={shine1.r} fill="white" opacity="0.9"/>
+        <circle style={{transition:"all .15s"}} cx={shine2.cx} cy={shine2.cy} r={shine2.r} fill="white" opacity="0.9"/>
+        {/* Cejas */}
+        {hovered ? (
+          <>
+            <path d="M 30 36 Q 37 31 44 34" fill="none" stroke="#111" strokeWidth="1.4" strokeLinecap="round"/>
+            <path d="M 56 34 Q 63 31 70 36" fill="none" stroke="#111" strokeWidth="1.4" strokeLinecap="round"/>
+          </>
+        ) : (
+          <>
+            <line x1="31" y1="41" x2="33" y2="39.5" stroke="#111" strokeWidth="0.8"/>
+            <line x1="34" y1="39.5" x2="35" y2="37.8" stroke="#111" strokeWidth="0.8"/>
+            <line x1="37" y1="39"   x2="37" y2="37"   stroke="#111" strokeWidth="0.8"/>
+            <line x1="40" y1="39.5" x2="41.5" y2="38" stroke="#111" strokeWidth="0.8"/>
+            <line x1="43" y1="41"   x2="44.5" y2="39.8" stroke="#111" strokeWidth="0.8"/>
+            <line x1="57" y1="41"   x2="55.5" y2="39.8" stroke="#111" strokeWidth="0.8"/>
+            <line x1="60" y1="39.5" x2="58.5" y2="38"   stroke="#111" strokeWidth="0.8"/>
+            <line x1="63" y1="39"   x2="63"   y2="37"   stroke="#111" strokeWidth="0.8"/>
+            <line x1="66" y1="39.5" x2="67"   y2="37.8" stroke="#111" strokeWidth="0.8"/>
+            <line x1="69" y1="41"   x2="71"   y2="39.5" stroke="#111" strokeWidth="0.8"/>
+          </>
+        )}
+        {/* Boca */}
+        <path style={{transition:"all .2s"}} d={mouthPath}
+          fill={hovered?"#111":"none"}
+          stroke={hovered?"none":"#111"}
+          strokeWidth="1.8" strokeLinecap="round"/>
+        {hovered && <ellipse cx="50" cy="64" rx="5" ry="4" fill="#FF4444" opacity="0.7"/>}
+        {/* Estrellitas hover */}
+        {hovered && [{x:15,y:20,r:3,delay:"0s"},{x:82,y:18,r:2.5,delay:"0.05s"},{x:10,y:60,r:2,delay:"0.1s"},{x:88,y:55,r:3,delay:"0.08s"},{x:50,y:8,r:2.5,delay:"0.03s"}].map((s,i)=>(
+          <polygon key={i} style={{animation:`floatStar 0.6s ${s.delay} ease-out forwards`,opacity:0}}
+            points={Array.from({length:5},(_,j)=>{
+              const a1=Math.PI/2+(j*2*Math.PI)/5,a2=a1+Math.PI/5;
+              return `${s.x+s.r*Math.cos(a1)},${s.y-s.r*Math.sin(a1)} ${s.x+(s.r*0.45)*Math.cos(a2)},${s.y-(s.r*0.45)*Math.sin(a2)}`;
+            }).join(" ")} fill="#FFE600"/>
+        ))}
+      </>}
 
-      {/* Mejillas */}
-      <ellipse style={{transition:"all .15s"}} cx="32" cy="56" rx={hovered?6:4} ry={hovered?3.5:2.5} fill="#FF6B6B" opacity={hovered?0.65:0.4}/>
-      <ellipse style={{transition:"all .15s"}} cx="68" cy="56" rx={hovered?6:4} ry={hovered?3.5:2.5} fill="#FF6B6B" opacity={hovered?0.65:0.4}/>
-
-      {/* Estrellitas que salen volando en hover */}
-      {hovered && [
-        {x:15,y:20,r:3,delay:"0s"},{x:82,y:18,r:2.5,delay:"0.05s"},
-        {x:10,y:60,r:2,delay:"0.1s"},{x:88,y:55,r:3,delay:"0.08s"},
-        {x:50,y:8, r:2.5,delay:"0.03s"},
-      ].map((s,i)=>(
-        <polygon key={i} style={{animation:`floatStar 0.6s ${s.delay} ease-out forwards`,opacity:0}}
-          points={Array.from({length:5},(_,j)=>{
-            const a1=Math.PI/2+(j*2*Math.PI)/5,a2=a1+Math.PI/5;
-            return `${s.x+s.r*Math.cos(a1)},${s.y-s.r*Math.sin(a1)} ${s.x+(s.r*0.45)*Math.cos(a2)},${s.y-(s.r*0.45)*Math.sin(a2)}`;
-          }).join(" ")}
-          fill="#FFE600"/>
-      ))}
+      {/* Mejillas (siempre visibles, cambian tamaño) */}
+      {!spinning && <>
+        <ellipse style={{transition:"all .2s"}} cx="32" cy="56" rx={cheekSize} ry={cheekSize*0.55} fill="#FF6B6B" opacity={cheekOpacity}/>
+        <ellipse style={{transition:"all .2s"}} cx="68" cy="56" rx={cheekSize} ry={cheekSize*0.55} fill="#FF6B6B" opacity={cheekOpacity}/>
+      </>}
     </svg>
   );
 }
 
 function StarWrapper() {
-  const [hovered, setHovered] = useState(false);
+  const [hovered,  setHovered]  = useState(false);
   const [wiggling, setWiggling] = useState(false);
+  const [spinning, setSpinning] = useState(false);
+  const [smiling,  setSmiling]  = useState(false);
 
-  const handleEnter = () => {
-    setHovered(true);
-    setWiggling(true);
-    // Cambiar ojos: los pupils se mueven
-  };
-  const handleLeave = () => {
+  const handleEnter = () => { if(spinning) return; setHovered(true); setWiggling(true); };
+  const handleLeave = () => { if(spinning) return; setHovered(false); setTimeout(()=>setWiggling(false),700); };
+
+  const handleClick = () => {
+    if(spinning) return;
     setHovered(false);
-    setTimeout(() => setWiggling(false), 700);
+    setWiggling(false);
+    setSmiling(false);
+    setSpinning(true);
+    // Al terminar la animación (1.8s) → cara sonriente durante 1.5s
+    setTimeout(() => {
+      setSpinning(false);
+      setSmiling(true);
+      setTimeout(() => setSmiling(false), 1500);
+    }, 1800);
   };
+
+  const cls = spinning ? "star-spin" : wiggling ? "star-hover" : "star-wrap";
 
   return (
     <div
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
-      style={{position:"absolute",top:"5%",left:"34%",width:"32%",bottom:"12%",zIndex:5}}
+      onClick={handleClick}
+      style={{position:"absolute",top:"5%",left:"34%",width:"32%",bottom:"12%",zIndex:5,cursor:spinning?"default":"pointer"}}
     >
-      <div className={wiggling ? "star-hover" : "star-wrap"} style={{width:"100%",height:"100%"}}>
-        <StarSVG hovered={hovered}/>
+      <div className={cls} style={{width:"100%",height:"100%"}}>
+        <StarSVG hovered={hovered} smiling={smiling} spinning={spinning}/>
       </div>
     </div>
   );
@@ -839,6 +907,19 @@ export default function InspectAdaptBoard() {
           100%{transform:scale(1) rotate(0deg)}
         }
         .star-hover{animation:starWiggle 0.7s ease-in-out,starP 2.8s ease-in-out 0.7s infinite;transform-origin:center;filter:drop-shadow(0 0 40px #FFE600ff) drop-shadow(0 0 80px #FF8C00cc)!important}
+        @keyframes spinTop{
+          0%   {transform:rotate(0deg)   scale(1.05) translateY(0px)}
+          10%  {transform:rotate(360deg) scale(1.25) translateY(-6px)}
+          20%  {transform:rotate(720deg) scale(1.35) translateY(-10px)}
+          35%  {transform:rotate(1440deg) scale(1.3) translateY(-8px)}
+          55%  {transform:rotate(2520deg) scale(1.2) translateY(-4px)}
+          72%  {transform:rotate(3240deg) scale(1.1) translateY(-2px)}
+          85%  {transform:rotate(3600deg) scale(1.05) translateY(0px)}
+          92%  {transform:rotate(3630deg) scale(1.08) translateY(-2px)}
+          96%  {transform:rotate(3615deg) scale(1.06) translateY(-1px)}
+          100% {transform:rotate(3600deg) scale(1) translateY(0px)}
+        }
+        .star-spin{animation:spinTop 1.8s cubic-bezier(0.2,0,0.4,1) forwards;transform-origin:center;filter:drop-shadow(0 0 50px #FFE600ff) drop-shadow(0 0 90px #FF8C00dd)!important;cursor:default}
         @keyframes floatP{0%{transform:translateY(0) translateX(0) scale(1);opacity:.8}33%{transform:translateY(-12px) translateX(5px) scale(1.2);opacity:1}66%{transform:translateY(-6px) translateX(-8px) scale(.9);opacity:.7}100%{transform:translateY(-18px) translateX(3px) scale(1.1);opacity:.9}}
         @keyframes floatStar{0%{opacity:1;transform:scale(0) translate(0,0)}60%{opacity:1;transform:scale(1.4) translate(0,-12px)}100%{opacity:0;transform:scale(0.8) translate(0,-22px)}}
         @keyframes eqP{from{height:var(--min-h,10px)}to{height:var(--max-h,36px)}}
