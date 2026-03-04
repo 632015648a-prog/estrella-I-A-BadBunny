@@ -579,49 +579,128 @@ function MarioKartBg() {
 }
 
 // ── Star central ─────────────────────────────
-function StarSVG() {
+function StarSVG({ hovered = false }) {
   const pts = Array.from({length:5},(_,i)=>{
     const o=46,inn=20;
     const a1=Math.PI/2+(i*2*Math.PI)/5,a2=a1+Math.PI/5;
     return `${50+o*Math.cos(a1)},${50-o*Math.sin(a1)} ${50+inn*Math.cos(a2)},${50-inn*Math.sin(a2)}`;
   }).join(" ");
+
+  // Ojos normales vs hover (sorpresa: pupils arriba, boca abierta)
+  const eyeL  = hovered ? {cx:37, cy:43, rx:7,   ry:8.5} : {cx:37, cy:46, rx:6.5, ry:7};
+  const eyeR  = hovered ? {cx:63, cy:43, rx:7,   ry:8.5} : {cx:63, cy:46, rx:6.5, ry:7};
+  const pupL  = hovered ? {cx:36, cy:40, rx:3,   ry:3.5} : {cx:38.5,cy:47.5,rx:3.5,ry:4};
+  const pupR  = hovered ? {cx:62, cy:40, rx:3,   ry:3.5} : {cx:64.5,cy:47.5,rx:3.5,ry:4};
+  const shine1= hovered ? {cx:37.5,cy:38.5,r:1.2} : {cx:40,cy:45.5,r:1.2};
+  const shine2= hovered ? {cx:63.5,cy:38.5,r:1.2} : {cx:66,cy:45.5,r:1.2};
+  const mouth = hovered
+    ? "M 40 60 Q 50 70 60 60"    // boca muy abierta sorpresa
+    : "M 41 57 Q 50 63 59 57";   // sonrisa normal
+
   return (
     <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"
-      style={{width:"100%",height:"100%",overflow:"visible"}}>
+      style={{width:"100%",height:"100%",overflow:"visible",transition:"all .15s"}}>
       <defs>
         <filter id="sGlow" x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur stdDeviation="2.5" result="b"/>
           <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
+        <filter id="sGlowBig" x="-80%" y="-80%" width="260%" height="260%">
+          <feGaussianBlur stdDeviation={hovered ? "6" : "2.5"} result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
         <radialGradient id="sGrad" cx="50%" cy="38%" r="62%">
-          <stop offset="0%"   stopColor="#FFE600"/>
-          <stop offset="42%"  stopColor="#FF8C00"/>
-          <stop offset="100%" stopColor="#FF003C"/>
+          <stop offset="0%"   stopColor={hovered ? "#ffffff" : "#FFE600"}/>
+          <stop offset="42%"  stopColor={hovered ? "#FFE600" : "#FF8C00"}/>
+          <stop offset="100%" stopColor={hovered ? "#FF8C00" : "#FF003C"}/>
         </radialGradient>
       </defs>
+      {/* Halo extra en hover */}
+      {hovered && <circle cx="50" cy="50" r="52" fill="#FFE600" opacity="0.12"/>}
+      {hovered && <circle cx="50" cy="50" r="48" fill="#FFE600" opacity="0.08"/>}
       <circle cx="50" cy="50" r="48" fill="none" stroke="#FFE600" strokeWidth="0.5" opacity="0.2"/>
-      <polygon points={pts} fill="url(#sGrad)" filter="url(#sGlow)"/>
+      <polygon points={pts} fill="url(#sGrad)" filter="url(#sGlowBig)"/>
       <polygon points={pts} fill="none" stroke="#FFE600" strokeWidth="0.7" opacity="0.6"/>
-      <ellipse cx="37" cy="46" rx="6.5" ry="7"   fill="white"/>
-      <ellipse cx="63" cy="46" rx="6.5" ry="7"   fill="white"/>
-      <ellipse cx="38.5" cy="47.5" rx="3.5" ry="4" fill="#111"/>
-      <ellipse cx="64.5" cy="47.5" rx="3.5" ry="4" fill="#111"/>
-      <circle cx="40" cy="45.5" r="1.2" fill="white" opacity="0.9"/>
-      <circle cx="66" cy="45.5" r="1.2" fill="white" opacity="0.9"/>
-      <line x1="31" y1="41" x2="33" y2="39.5" stroke="#111" strokeWidth="0.8"/>
-      <line x1="34" y1="39.5" x2="35" y2="37.8" stroke="#111" strokeWidth="0.8"/>
-      <line x1="37" y1="39"   x2="37" y2="37"   stroke="#111" strokeWidth="0.8"/>
-      <line x1="40" y1="39.5" x2="41.5" y2="38" stroke="#111" strokeWidth="0.8"/>
-      <line x1="43" y1="41"   x2="44.5" y2="39.8" stroke="#111" strokeWidth="0.8"/>
-      <line x1="57" y1="41"   x2="55.5" y2="39.8" stroke="#111" strokeWidth="0.8"/>
-      <line x1="60" y1="39.5" x2="58.5" y2="38"   stroke="#111" strokeWidth="0.8"/>
-      <line x1="63" y1="39"   x2="63"   y2="37"   stroke="#111" strokeWidth="0.8"/>
-      <line x1="66" y1="39.5" x2="67"   y2="37.8" stroke="#111" strokeWidth="0.8"/>
-      <line x1="69" y1="41"   x2="71"   y2="39.5" stroke="#111" strokeWidth="0.8"/>
-      <path d="M 41 57 Q 50 63 59 57" fill="none" stroke="#111" strokeWidth="1.8" strokeLinecap="round"/>
-      <ellipse cx="32" cy="56" rx="4" ry="2.5" fill="#FF6B6B" opacity="0.4"/>
-      <ellipse cx="68" cy="56" rx="4" ry="2.5" fill="#FF6B6B" opacity="0.4"/>
+
+      {/* Ojos — transición suave */}
+      <ellipse style={{transition:"all .15s"}} cx={eyeL.cx} cy={eyeL.cy} rx={eyeL.rx} ry={eyeL.ry} fill="white"/>
+      <ellipse style={{transition:"all .15s"}} cx={eyeR.cx} cy={eyeR.cy} rx={eyeR.rx} ry={eyeR.ry} fill="white"/>
+      <ellipse style={{transition:"all .15s"}} cx={pupL.cx} cy={pupL.cy} rx={pupL.rx} ry={pupL.ry} fill="#111"/>
+      <ellipse style={{transition:"all .15s"}} cx={pupR.cx} cy={pupR.cy} rx={pupR.rx} ry={pupR.ry} fill="#111"/>
+      <circle style={{transition:"all .15s"}} cx={shine1.cx} cy={shine1.cy} r={shine1.r} fill="white" opacity="0.9"/>
+      <circle style={{transition:"all .15s"}} cx={shine2.cx} cy={shine2.cy} r={shine2.r} fill="white" opacity="0.9"/>
+
+      {/* Cejas — se levantan en hover (sorpresa) */}
+      {hovered ? (
+        <>
+          <path d="M 30 36 Q 37 31 44 34" fill="none" stroke="#111" strokeWidth="1.4" strokeLinecap="round"/>
+          <path d="M 56 34 Q 63 31 70 36" fill="none" stroke="#111" strokeWidth="1.4" strokeLinecap="round"/>
+        </>
+      ) : (
+        <>
+          <line x1="31" y1="41" x2="33" y2="39.5" stroke="#111" strokeWidth="0.8"/>
+          <line x1="34" y1="39.5" x2="35" y2="37.8" stroke="#111" strokeWidth="0.8"/>
+          <line x1="37" y1="39"   x2="37" y2="37"   stroke="#111" strokeWidth="0.8"/>
+          <line x1="40" y1="39.5" x2="41.5" y2="38" stroke="#111" strokeWidth="0.8"/>
+          <line x1="43" y1="41"   x2="44.5" y2="39.8" stroke="#111" strokeWidth="0.8"/>
+          <line x1="57" y1="41"   x2="55.5" y2="39.8" stroke="#111" strokeWidth="0.8"/>
+          <line x1="60" y1="39.5" x2="58.5" y2="38"   stroke="#111" strokeWidth="0.8"/>
+          <line x1="63" y1="39"   x2="63"   y2="37"   stroke="#111" strokeWidth="0.8"/>
+          <line x1="66" y1="39.5" x2="67"   y2="37.8" stroke="#111" strokeWidth="0.8"/>
+          <line x1="69" y1="41"   x2="71"   y2="39.5" stroke="#111" strokeWidth="0.8"/>
+        </>
+      )}
+
+      {/* Boca */}
+      <path style={{transition:"all .2s"}} d={mouth} fill={hovered?"#111":"none"}
+        stroke={hovered?"none":"#111"} strokeWidth="1.8" strokeLinecap="round"/>
+      {hovered && <ellipse cx="50" cy="64" rx="5" ry="4" fill="#FF4444" opacity="0.7"/>}
+
+      {/* Mejillas */}
+      <ellipse style={{transition:"all .15s"}} cx="32" cy="56" rx={hovered?6:4} ry={hovered?3.5:2.5} fill="#FF6B6B" opacity={hovered?0.65:0.4}/>
+      <ellipse style={{transition:"all .15s"}} cx="68" cy="56" rx={hovered?6:4} ry={hovered?3.5:2.5} fill="#FF6B6B" opacity={hovered?0.65:0.4}/>
+
+      {/* Estrellitas que salen volando en hover */}
+      {hovered && [
+        {x:15,y:20,r:3,delay:"0s"},{x:82,y:18,r:2.5,delay:"0.05s"},
+        {x:10,y:60,r:2,delay:"0.1s"},{x:88,y:55,r:3,delay:"0.08s"},
+        {x:50,y:8, r:2.5,delay:"0.03s"},
+      ].map((s,i)=>(
+        <polygon key={i} style={{animation:`floatStar 0.6s ${s.delay} ease-out forwards`,opacity:0}}
+          points={Array.from({length:5},(_,j)=>{
+            const a1=Math.PI/2+(j*2*Math.PI)/5,a2=a1+Math.PI/5;
+            return `${s.x+s.r*Math.cos(a1)},${s.y-s.r*Math.sin(a1)} ${s.x+(s.r*0.45)*Math.cos(a2)},${s.y-(s.r*0.45)*Math.sin(a2)}`;
+          }).join(" ")}
+          fill="#FFE600"/>
+      ))}
     </svg>
+  );
+}
+
+function StarWrapper() {
+  const [hovered, setHovered] = useState(false);
+  const [wiggling, setWiggling] = useState(false);
+
+  const handleEnter = () => {
+    setHovered(true);
+    setWiggling(true);
+    // Cambiar ojos: los pupils se mueven
+  };
+  const handleLeave = () => {
+    setHovered(false);
+    setTimeout(() => setWiggling(false), 700);
+  };
+
+  return (
+    <div
+      onMouseEnter={handleEnter}
+      onMouseLeave={handleLeave}
+      style={{position:"absolute",top:"5%",left:"34%",width:"32%",bottom:"12%",zIndex:5}}
+    >
+      <div className={wiggling ? "star-hover" : "star-wrap"} style={{width:"100%",height:"100%"}}>
+        <StarSVG hovered={hovered}/>
+      </div>
+    </div>
   );
 }
 
@@ -743,8 +822,25 @@ export default function InspectAdaptBoard() {
         @keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
         .ticker-inner{display:inline-block;white-space:nowrap;animation:ticker 24s linear infinite}
         @keyframes starP{0%,100%{transform:scale(1);filter:drop-shadow(0 0 8px #FFE600aa)}50%{transform:scale(1.05);filter:drop-shadow(0 0 32px #FFE600dd) drop-shadow(0 0 60px #FF8C0088)}}
-        .star-wrap{animation:starP 2.8s ease-in-out infinite;transform-origin:center}
+        .star-wrap{animation:starP 2.8s ease-in-out infinite;transform-origin:center;cursor:pointer}
+        @keyframes starWiggle{
+          0%  {transform:scale(1) rotate(0deg)}
+          8%  {transform:scale(1.18) rotate(-12deg)}
+          16% {transform:scale(1.22) rotate(12deg)}
+          24% {transform:scale(1.15) rotate(-10deg)}
+          32% {transform:scale(1.25) rotate(8deg)}
+          40% {transform:scale(1.1) rotate(-6deg) translateY(-8px)}
+          50% {transform:scale(1.3) rotate(0deg) translateY(-14px)}
+          60% {transform:scale(1.1) rotate(6deg) translateY(-8px)}
+          68% {transform:scale(1.2) rotate(-8deg)}
+          76% {transform:scale(1.15) rotate(10deg)}
+          84% {transform:scale(1.22) rotate(-12deg)}
+          92% {transform:scale(1.1) rotate(6deg)}
+          100%{transform:scale(1) rotate(0deg)}
+        }
+        .star-hover{animation:starWiggle 0.7s ease-in-out,starP 2.8s ease-in-out 0.7s infinite;transform-origin:center;filter:drop-shadow(0 0 40px #FFE600ff) drop-shadow(0 0 80px #FF8C00cc)!important}
         @keyframes floatP{0%{transform:translateY(0) translateX(0) scale(1);opacity:.8}33%{transform:translateY(-12px) translateX(5px) scale(1.2);opacity:1}66%{transform:translateY(-6px) translateX(-8px) scale(.9);opacity:.7}100%{transform:translateY(-18px) translateX(3px) scale(1.1);opacity:.9}}
+        @keyframes floatStar{0%{opacity:1;transform:scale(0) translate(0,0)}60%{opacity:1;transform:scale(1.4) translate(0,-12px)}100%{opacity:0;transform:scale(0.8) translate(0,-22px)}}
         @keyframes eqP{from{height:var(--min-h,10px)}to{height:var(--max-h,36px)}}
         .exp-btn{display:flex;align-items:center;gap:7px;background:linear-gradient(135deg,#FFE600,#FF8C00);border:none;border-radius:8px;color:#000;font-family:'Bebas Neue',cursive;font-size:14px;letter-spacing:2px;padding:8px 18px;cursor:pointer;box-shadow:0 0 18px #FFE60055;transition:transform .15s,box-shadow .15s}
         .exp-btn:hover{transform:translateY(-2px);box-shadow:0 0 32px #FFE600aa}
@@ -797,9 +893,7 @@ export default function InspectAdaptBoard() {
             <MarioKartBg/>
             <div style={{position:"absolute",inset:0,zIndex:1,pointerEvents:"none",backgroundImage:`url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E")`,backgroundSize:"256px",opacity:.15}}/>
 
-            <div style={{position:"absolute",top:"5%",left:"34%",width:"32%",bottom:"12%",zIndex:5}}>
-              <div className="star-wrap" style={{width:"100%",height:"100%"}}><StarSVG/></div>
-            </div>
+            <StarWrapper/>
 
             <div style={{position:"absolute",top:"3%",left:"28%",width:"44%",bottom:"8%",zIndex:6,pointerEvents:"none"}}>
               <Particles/>
