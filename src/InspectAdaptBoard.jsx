@@ -11,11 +11,11 @@ const COLORS = {
 };
 
 const CARD_CONFIG = [
-  { id:"stop",     label:"Dejar de...",   color:COLORS.magenta, pos:{top:"4%",left:"2%"},     defaultText:"• Centralizar el conocimiento de un tema en una persona\n• Hacer PRs que nadie revisa durante días\n• Planificar sin capacidad real del equipo" },
-  { id:"start",    label:"Comenzar a...", color:COLORS.neon,    pos:{top:"4%",right:"2%"},    defaultText:"• Usar git correctamente: ramas, PRs y commits limpios\n• Definir Definition of Done antes de iniciar una tarea\n• Hacer demos internas antes de la Sprint Review" },
-  { id:"less",     label:"Menos de...",   color:COLORS.yellow,  pos:{top:"47%",left:"2%"},    defaultText:"• Faltar a las arch meetings sin avisar\n• Cambiar el scope a mitad del sprint\n• Reuniones de más de 45 min sin agenda" },
-  { id:"more",     label:"Más de...",     color:COLORS.orange,  pos:{top:"47%",right:"2%"},   defaultText:"• Escribir las cosas pendientes entre sprints en el backlog\n• Refactorizar mientras añadimos features\n• Compartir aprendizajes en el canal de equipo" },
-  { id:"continue", label:"Seguir...",     color:COLORS.cyan,    pos:{bottom:"2%",left:"50%",transform:"translateX(-50%)"}, width:"24%",
+  { id:"stop",     label:"Dejar de...",   color:COLORS.magenta, pos:{top:"3%",  left:"2%"},           defaultText:"• Centralizar el conocimiento de un tema en una persona\n• Hacer PRs que nadie revisa durante días\n• Planificar sin capacidad real del equipo" },
+  { id:"start",    label:"Comenzar a...", color:COLORS.neon,    pos:{top:"3%",  right:"2%"},          defaultText:"• Usar git correctamente: ramas, PRs y commits limpios\n• Definir Definition of Done antes de iniciar una tarea\n• Hacer demos internas antes de la Sprint Review" },
+  { id:"less",     label:"Menos de...",   color:COLORS.yellow,  pos:{top:"44%", left:"2%"},           defaultText:"• Faltar a las arch meetings sin avisar\n• Cambiar el scope a mitad del sprint\n• Reuniones de más de 45 min sin agenda" },
+  { id:"more",     label:"Más de...",     color:COLORS.orange,  pos:{top:"44%", right:"2%"},          defaultText:"• Escribir las cosas pendientes entre sprints en el backlog\n• Refactorizar mientras añadimos features\n• Compartir aprendizajes en el canal de equipo" },
+  { id:"continue", label:"Seguir...",     color:COLORS.cyan,    pos:{top:"72%",  left:"50%",transform:"translateX(-50%)"}, width:"24%",
     defaultText:"• Dejando las cosas anotadas en la wiki del equipo\n• Haciendo retrospectivas honestas y accionables\n• Entrega continua con pipelines automatizados" },
 ];
 
@@ -694,7 +694,7 @@ function Card({card,value,onClick}) {
         <span style={{fontFamily:"'Bebas Neue',cursive",fontSize:15,letterSpacing:1.5,color:light?"#000":"#fff",lineHeight:1}}>{card.label}</span>
         <span style={{fontSize:10,opacity:.6}}>✦</span>
       </div>
-      <div style={{padding:"9px 11px 22px",fontFamily:"'DM Mono',monospace",fontSize:11.5,color:"#ddd",lineHeight:1.75,whiteSpace:"pre-wrap",minHeight:70}}>
+      <div style={{padding:"8px 11px 18px",fontFamily:"'DM Mono',monospace",fontSize:11,color:"#ddd",lineHeight:1.6,whiteSpace:"pre-wrap",minHeight:55}}>
         {value||<span style={{color:"#555",fontStyle:"italic"}}>Click para editar...</span>}
       </div>
       {hovered&&<div style={{position:"absolute",bottom:7,right:9,fontSize:13}}>✏️</div>}
@@ -793,7 +793,7 @@ export default function InspectAdaptBoard() {
           </div>
 
           {/* BOARD */}
-          <div style={{position:"relative",width:"100%",paddingBottom:"52%",overflow:"hidden"}}>
+          <div style={{position:"relative",width:"100%",paddingBottom:"56%",overflow:"hidden"}}>
             <MarioKartBg/>
             <div style={{position:"absolute",inset:0,zIndex:1,pointerEvents:"none",backgroundImage:`url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E")`,backgroundSize:"256px",opacity:.15}}/>
 
