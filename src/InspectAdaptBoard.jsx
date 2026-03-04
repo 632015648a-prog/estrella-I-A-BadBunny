@@ -19,7 +19,7 @@ const CARD_CONFIG = [
     defaultText:"• Dejando las cosas anotadas en la wiki del equipo\n• Haciendo retrospectivas honestas y accionables\n• Entrega continua con pipelines automatizados" },
 ];
 
-const TICKER_TEXT = "INSPECT & ADAPT · BAD BUNNY TEAM · SAFe · UN VERANO SIN BUGS · WORLD'S HOTTEST SCRUM · EL APAGÓN DE DEUDA TÉCNICA · BABY MÁS VELOCITY · ";
+const TICKER_TEXT = "INSPECT & ADAPT · BAD BUNNY TEAM · SAFe · UN VERANO SIN BUGS · WORLD'S HOTTEST COACH · EL APAGÓN DE DEUDA TÉCNICA · VOY A APROBARTE LA PR · DEBI TIRAR MAS TESTS · NUMO YOL ";
 
 // ══════════════════════════════════════════════════════════════
 //  MARIO KART BACKGROUND — Rainbow Road edition
@@ -854,9 +854,9 @@ function Card({card,value,onClick}) {
 export default function InspectAdaptBoard() {
   const [cardTexts,setCardTexts]=useState(Object.fromEntries(CARD_CONFIG.map(c=>[c.id,c.defaultText])));
   const [editingCard,setEditingCard]=useState(null);
-  const [piName,setPiName]=useState("PI 2025 Q4");
+  const [piName,setPiName]=useState("PI 6.2");
   const [editingPI,setEditingPI]=useState(false);
-  const [piInput,setPiInput]=useState("PI 2025 Q4");
+  const [piInput,setPiInput]=useState("PI 6.2");
   const [exporting,setExporting]=useState(false);
   const wrapRef=useRef(null);
 
