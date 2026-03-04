@@ -11,12 +11,12 @@ const COLORS = {
 };
 
 const CARD_CONFIG = [
-  { id:"stop",     label:"Dejar de...",   color:COLORS.magenta, pos:{top:"4%",left:"2%"},     defaultText:"• Meetings sin agenda clara\n• Code sin revisión\n• Ignorar la deuda técnica" },
-  { id:"start",    label:"Comenzar a...", color:COLORS.neon,    pos:{top:"4%",right:"2%"},    defaultText:"• Pair programming semanal\n• TDD en nuevas features\n• Documentar decisiones" },
-  { id:"less",     label:"Menos de...",   color:COLORS.yellow,  pos:{top:"50%",left:"2%"},    defaultText:"• Over-engineering\n• Interrupciones en el flow\n• Scope creep sin control" },
-  { id:"more",     label:"Más de...",     color:COLORS.orange,  pos:{top:"50%",right:"2%"},   defaultText:"• Feedback temprano\n• Automatización de pruebas\n• Celebrar victorias" },
+  { id:"stop",     label:"Dejar de...",   color:COLORS.magenta, pos:{top:"4%",left:"2%"},     defaultText:"• Centralizar el conocimiento de un tema en una persona\n• Hacer PRs que nadie revisa durante días\n• Planificar sin capacidad real del equipo" },
+  { id:"start",    label:"Comenzar a...", color:COLORS.neon,    pos:{top:"4%",right:"2%"},    defaultText:"• Usar git correctamente: ramas, PRs y commits limpios\n• Definir Definition of Done antes de iniciar una tarea\n• Hacer demos internas antes de la Sprint Review" },
+  { id:"less",     label:"Menos de...",   color:COLORS.yellow,  pos:{top:"50%",left:"2%"},    defaultText:"• Faltar a las arch meetings sin avisar\n• Cambiar el scope a mitad del sprint\n• Reuniones de más de 45 min sin agenda" },
+  { id:"more",     label:"Más de...",     color:COLORS.orange,  pos:{top:"50%",right:"2%"},   defaultText:"• Escribir las cosas pendientes entre sprints en el backlog\n• Refactorizar mientras añadimos features\n• Compartir aprendizajes en el canal de equipo" },
   { id:"continue", label:"Seguir...",     color:COLORS.cyan,    pos:{bottom:"5%",left:"50%",transform:"translateX(-50%)"},
-    defaultText:"• Daily standups efectivos\n• Retrospectivas honestas\n• Entrega continua" },
+    defaultText:"• Dejando las cosas anotadas en la wiki del equipo\n• Haciendo retrospectivas honestas y accionables\n• Entrega continua con pipelines automatizados" },
 ];
 
 const TICKER_TEXT = "INSPECT & ADAPT · BAD BUNNY TEAM · SAFe · UN VERANO SIN BUGS · WORLD'S HOTTEST SCRUM · EL APAGÓN DE DEUDA TÉCNICA · BABY MÁS VELOCITY · ";
@@ -707,9 +707,9 @@ function Card({card,value,onClick}) {
 export default function InspectAdaptBoard() {
   const [cardTexts,setCardTexts]=useState(Object.fromEntries(CARD_CONFIG.map(c=>[c.id,c.defaultText])));
   const [editingCard,setEditingCard]=useState(null);
-  const [piName,setPiName]=useState("PI 2025 Q2");
+  const [piName,setPiName]=useState("PI 2025 Q4");
   const [editingPI,setEditingPI]=useState(false);
-  const [piInput,setPiInput]=useState("PI 2025 Q2");
+  const [piInput,setPiInput]=useState("PI 2025 Q4");
   const [exporting,setExporting]=useState(false);
   const wrapRef=useRef(null);
 
@@ -753,9 +753,8 @@ export default function InspectAdaptBoard() {
       `}</style>
 
       <div style={{background:"#050505",minHeight:"100vh",padding:"14px 8px 28px"}}>
-        <div style={{maxWidth:1100,margin:"0 auto 10px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-          <div style={{fontFamily:"'DM Mono',monospace",fontSize:10,color:"#333",letterSpacing:2}}>🐰 BAD BUNNY TEAM · SAFe Agile</div>
-          <button className="exp-btn" onClick={handleExport} disabled={exporting}>{exporting?"⏳ EXPORTANDO...":"📥 EXPORTAR PNG para PowerPoint"}</button>
+        <div style={{maxWidth:1100,margin:"0 auto 10px",display:"flex",alignItems:"center",justifyContent:"flex-end"}}>
+          <button onClick={handleExport} disabled={exporting} title="Exportar PNG" style={{background:"transparent",border:"1px solid #2a2a2a",borderRadius:6,color:"#444",fontFamily:"'DM Mono',monospace",fontSize:9,letterSpacing:1,padding:"4px 8px",cursor:"pointer",opacity:0.45,transition:"opacity .2s"}} onMouseEnter={e=>e.currentTarget.style.opacity="1"} onMouseLeave={e=>e.currentTarget.style.opacity="0.45"}>{exporting?"...":"📥 PNG"}</button>
         </div>
 
         <div ref={wrapRef} style={{maxWidth:1100,margin:"0 auto",borderRadius:14,overflow:"hidden",border:"1px solid #1e1e1e",boxShadow:"0 0 0 1px #111,0 24px 80px rgba(0,255,135,0.07)"}}>
@@ -837,11 +836,7 @@ export default function InspectAdaptBoard() {
           </div>
         </div>
 
-        <div style={{maxWidth:1100,margin:"8px auto 0",textAlign:"center",fontFamily:"'DM Mono',monospace",fontSize:10,color:"#2a2a2a",letterSpacing:2}}>
-          INSPECT &amp; ADAPT · BAD BUNNY TEAM · SAFe ·{" "}
-          <span style={{color:COLORS.neon}}>Click en las tarjetas para editar</span>
-          {" · "}<span style={{color:COLORS.yellow}}>Exporta PNG para PowerPoint</span>
-        </div>
+
       </div>
 
       {editingCard&&(<EditModal card={editingCard} value={cardTexts[editingCard.id]} onSave={txt=>handleSave(editingCard.id,txt)} onClose={()=>setEditingCard(null)}/>)}
