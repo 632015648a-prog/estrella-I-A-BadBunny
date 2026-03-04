@@ -13,9 +13,9 @@ const COLORS = {
 const CARD_CONFIG = [
   { id:"stop",     label:"Dejar de...",   color:COLORS.magenta, pos:{top:"4%",left:"2%"},     defaultText:"• Centralizar el conocimiento de un tema en una persona\n• Hacer PRs que nadie revisa durante días\n• Planificar sin capacidad real del equipo" },
   { id:"start",    label:"Comenzar a...", color:COLORS.neon,    pos:{top:"4%",right:"2%"},    defaultText:"• Usar git correctamente: ramas, PRs y commits limpios\n• Definir Definition of Done antes de iniciar una tarea\n• Hacer demos internas antes de la Sprint Review" },
-  { id:"less",     label:"Menos de...",   color:COLORS.yellow,  pos:{top:"50%",left:"2%"},    defaultText:"• Faltar a las arch meetings sin avisar\n• Cambiar el scope a mitad del sprint\n• Reuniones de más de 45 min sin agenda" },
-  { id:"more",     label:"Más de...",     color:COLORS.orange,  pos:{top:"50%",right:"2%"},   defaultText:"• Escribir las cosas pendientes entre sprints en el backlog\n• Refactorizar mientras añadimos features\n• Compartir aprendizajes en el canal de equipo" },
-  { id:"continue", label:"Seguir...",     color:COLORS.cyan,    pos:{bottom:"5%",left:"50%",transform:"translateX(-50%)"},
+  { id:"less",     label:"Menos de...",   color:COLORS.yellow,  pos:{top:"47%",left:"2%"},    defaultText:"• Faltar a las arch meetings sin avisar\n• Cambiar el scope a mitad del sprint\n• Reuniones de más de 45 min sin agenda" },
+  { id:"more",     label:"Más de...",     color:COLORS.orange,  pos:{top:"47%",right:"2%"},   defaultText:"• Escribir las cosas pendientes entre sprints en el backlog\n• Refactorizar mientras añadimos features\n• Compartir aprendizajes en el canal de equipo" },
+  { id:"continue", label:"Seguir...",     color:COLORS.cyan,    pos:{bottom:"2%",left:"50%",transform:"translateX(-50%)"}, width:"24%",
     defaultText:"• Dejando las cosas anotadas en la wiki del equipo\n• Haciendo retrospectivas honestas y accionables\n• Entrega continua con pipelines automatizados" },
 ];
 
@@ -683,7 +683,7 @@ function Card({card,value,onClick}) {
   const light=card.color===COLORS.yellow||card.color===COLORS.neon;
   return (
     <div onClick={onClick} onMouseEnter={()=>setHovered(true)} onMouseLeave={()=>setHovered(false)}
-      style={{position:"absolute",...card.pos,width:"27%",
+      style={{position:"absolute",...card.pos,width:card.width||"27%",
         background:"rgba(0,0,0,0.82)",border:`1.5px solid ${card.color}`,
         borderRadius:10,cursor:"pointer",
         transition:"transform .25s,box-shadow .25s",
