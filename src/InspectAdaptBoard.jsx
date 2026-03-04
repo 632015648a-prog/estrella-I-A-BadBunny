@@ -11,12 +11,12 @@ const COLORS = {
 };
 
 const CARD_CONFIG = [
-  { id:"stop",     label:"Dejar de...",   color:COLORS.magenta, pos:{top:"3%",  left:"2%"},           defaultText:"• Centralizar el conocimiento de un tema en una persona\n• Hacer PRs que nadie revisa durante días\n• Planificar sin capacidad real del equipo" },
-  { id:"start",    label:"Comenzar a...", color:COLORS.neon,    pos:{top:"3%",  right:"2%"},          defaultText:"• Usar git correctamente: ramas, PRs y commits limpios\n• Definir Definition of Done antes de iniciar una tarea\n• Hacer demos internas antes de la Sprint Review" },
-  { id:"less",     label:"Menos de...",   color:COLORS.yellow,  pos:{top:"44%", left:"2%"},           defaultText:"• Faltar a las arch meetings sin avisar\n• Cambiar el scope a mitad del sprint\n• Reuniones de más de 45 min sin agenda" },
-  { id:"more",     label:"Más de...",     color:COLORS.orange,  pos:{top:"44%", right:"2%"},          defaultText:"• Escribir las cosas pendientes entre sprints en el backlog\n• Refactorizar mientras añadimos features\n• Compartir aprendizajes en el canal de equipo" },
+  { id:"stop",     label:"Dejar de...",   color:COLORS.magenta, pos:{top:"3%",  left:"2%"},           defaultText:"Centralizar el conocimiento de un tema en una persona" },
+  { id:"start",    label:"Comenzar a...", color:COLORS.neon,    pos:{top:"3%",  right:"2%"},          defaultText:"Usar git correctamente: ramas, PRs y commits limpios" },
+  { id:"less",     label:"Menos de...",   color:COLORS.yellow,  pos:{top:"44%", left:"2%"},           defaultText:"Faltar a las arch meetings sin avisar" },
+  { id:"more",     label:"Más de...",     color:COLORS.orange,  pos:{top:"44%", right:"2%"},          defaultText:"Escribir las cosas pendientes entre sprints en el backlog" },
   { id:"continue", label:"Seguir...",     color:COLORS.cyan,    pos:{top:"72%",  left:"50%",transform:"translateX(-50%)"}, width:"24%",
-    defaultText:"• Dejando las cosas anotadas en la wiki del equipo\n• Haciendo retrospectivas honestas y accionables\n• Entrega continua con pipelines automatizados" },
+    defaultText:"Dejando las cosas anotadas en la wiki del equipo" },
 ];
 
 const TICKER_TEXT = "INSPECT & ADAPT · BAD BUNNY TEAM · SAFe · UN VERANO SIN BUGS · WORLD'S HOTTEST COACH · EL APAGÓN DE DEUDA TÉCNICA · VOY A APROBARTE LA PR · DEBI TIRAR MAS TESTS · NUMO YOL ";
