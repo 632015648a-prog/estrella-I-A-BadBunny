@@ -1,4 +1,35 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+
+// ══════════════════════════════════════════════════════════════
+//  JSONBIN CONFIG  –  rellena BIN_ID y API_KEY tras crear el bin
+// ══════════════════════════════════════════════════════════════
+const JSONBIN_API_KEY = "$2a$10$lVP8VYNvBUWXuH.5kDcQHOAwD2HBCRORaIIauNUEJhDuvsc449kBm";
+const JSONBIN_BIN_ID  = "69ae853b43b1c97be9c3eda8";
+const JSONBIN_URL     = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
+
+async function loadFromCloud() {
+  try {
+    const res = await fetch(JSONBIN_URL + "/latest", {
+      headers: { "X-Master-Key": JSONBIN_API_KEY }
+    });
+    if (!res.ok) return null;
+    const json = await res.json();
+    return json.record || null;
+  } catch { return null; }
+}
+
+async function saveToCloud(data) {
+  try {
+    await fetch(JSONBIN_URL, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Master-Key": JSONBIN_API_KEY
+      },
+      body: JSON.stringify(data)
+    });
+  } catch { /* silencioso */ }
+}
 
 const COLORS = {
   neon:    "#00FF87",
@@ -852,35 +883,57 @@ function Card({card,value,onClick}) {
 
 // ══════════════════════════════════════════════
 export default function InspectAdaptBoard() {
-  // ── Inicializar desde localStorage (o valores por defecto) ──
-  const savedTexts = (() => {
+  // ── Inicializar desde localStorage como caché rápida ──
+  const localTexts = (() => {
     try { return JSON.parse(localStorage.getItem("bb_cardTexts")) || null; } catch { return null; }
   })();
-  const savedPI = localStorage.getItem("bb_piName") || "PI 6.2";
+  const localPI = localStorage.getItem("bb_piName") || "PI 6.2";
 
   const [cardTexts, setCardTexts] = useState(
-    savedTexts || Object.fromEntries(CARD_CONFIG.map(c => [c.id, c.defaultText]))
+    localTexts || Object.fromEntries(CARD_CONFIG.map(c => [c.id, c.defaultText]))
   );
   const [editingCard, setEditingCard] = useState(null);
-  const [piName,      setPiName]      = useState(savedPI);
+  const [piName,      setPiName]      = useState(localPI);
   const [editingPI,   setEditingPI]   = useState(false);
-  const [piInput,     setPiInput]     = useState(savedPI);
+  const [piInput,     setPiInput]     = useState(localPI);
   const [exporting,   setExporting]   = useState(false);
+  const [syncing,     setSyncing]     = useState(false);
   const wrapRef = useRef(null);
 
-  // ── Guardar tarjeta y persistir ──
+  // ── Al montar: cargar desde la nube (sobreescribe caché local si hay datos) ──
+  useEffect(() => {
+    setSyncing(true);
+    loadFromCloud().then(data => {
+      if (data) {
+        if (data.cardTexts) {
+          setCardTexts(data.cardTexts);
+          localStorage.setItem("bb_cardTexts", JSON.stringify(data.cardTexts));
+        }
+        if (data.piName) {
+          setPiName(data.piName);
+          setPiInput(data.piName);
+          localStorage.setItem("bb_piName", data.piName);
+        }
+      }
+      setSyncing(false);
+    });
+  }, []);
+
+  // ── Guardar tarjeta: localStorage + nube ──
   const handleSave = (id, txt) => {
     const next = { ...cardTexts, [id]: txt };
     setCardTexts(next);
     localStorage.setItem("bb_cardTexts", JSON.stringify(next));
     setEditingCard(null);
+    saveToCloud({ cardTexts: next, piName });
   };
 
-  // ── Guardar PI y persistir ──
+  // ── Guardar PI: localStorage + nube ──
   const handleSavePI = (name) => {
     setPiName(name);
     localStorage.setItem("bb_piName", name);
     setEditingPI(false);
+    saveToCloud({ cardTexts, piName: name });
   };
 
   const handleExport=async()=>{
@@ -951,7 +1004,8 @@ export default function InspectAdaptBoard() {
       `}</style>
 
       <div style={{background:"#050505",minHeight:"100vh",padding:"14px 8px 28px"}}>
-        <div style={{maxWidth:1100,margin:"0 auto 10px",display:"flex",alignItems:"center",justifyContent:"flex-end"}}>
+        <div style={{maxWidth:1100,margin:"0 auto 10px",display:"flex",alignItems:"center",justifyContent:"flex-end",gap:8}}>
+          {syncing && <span title="Sincronizando con la nube…" style={{color:"#444",fontFamily:"'DM Mono',monospace",fontSize:9,letterSpacing:1,opacity:0.6}}>☁️ sync…</span>}
           <button onClick={handleExport} disabled={exporting} title="Exportar PNG" style={{background:"transparent",border:"1px solid #2a2a2a",borderRadius:6,color:"#444",fontFamily:"'DM Mono',monospace",fontSize:9,letterSpacing:1,padding:"4px 8px",cursor:"pointer",opacity:0.45,transition:"opacity .2s"}} onMouseEnter={e=>e.currentTarget.style.opacity="1"} onMouseLeave={e=>e.currentTarget.style.opacity="0.45"}>{exporting?"...":"📥 PNG"}</button>
         </div>
 
