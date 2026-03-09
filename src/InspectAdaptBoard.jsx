@@ -1,34 +1,41 @@
 import { useState, useRef, useEffect } from "react";
 
 // ══════════════════════════════════════════════════════════════
-//  JSONBIN CONFIG  –  rellena BIN_ID y API_KEY tras crear el bin
+//  JSONBIN CONFIG
 // ══════════════════════════════════════════════════════════════
-const JSONBIN_API_KEY = "$2a$10$lVP8VYNvBUWXuH.5kDcQHOAwD2HBCRORaIIauNUEJhDuvsc449kBm";
-const JSONBIN_BIN_ID  = "69ae853b43b1c97be9c3eda8";
-const JSONBIN_URL     = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
+const JSONBIN_MASTER_KEY = "$2a$10$lVP8VYNvBUWXuH.5kDcQHOAwD2HBCRORaIIauNUEJhDuvsc449kBm";
+const JSONBIN_ACCESS_KEY = "$2a$10$adXtecYLKh0YIddbYUGIsuK.U2YaFeBbb4u1Mj2BISi9OXjWCBqai";
+const JSONBIN_BIN_ID     = "69ae853b43b1c97be9c3eda8";
+const JSONBIN_URL        = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
 
 async function loadFromCloud() {
   try {
     const res = await fetch(JSONBIN_URL + "/latest", {
-      headers: { "X-Master-Key": JSONBIN_API_KEY }
+      headers: {
+        "X-Master-Key": JSONBIN_MASTER_KEY,
+        "X-Access-Key":  JSONBIN_ACCESS_KEY
+      }
     });
-    if (!res.ok) return null;
+    if (!res.ok) { console.warn("JSONBin load error:", res.status, await res.text()); return null; }
     const json = await res.json();
     return json.record || null;
-  } catch { return null; }
+  } catch(e) { console.warn("JSONBin load exception:", e); return null; }
 }
 
 async function saveToCloud(data) {
   try {
-    await fetch(JSONBIN_URL, {
+    const res = await fetch(JSONBIN_URL, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        "X-Master-Key": JSONBIN_API_KEY
+        "X-Master-Key": JSONBIN_MASTER_KEY,
+        "X-Access-Key":  JSONBIN_ACCESS_KEY
       },
       body: JSON.stringify(data)
     });
-  } catch { /* silencioso */ }
+    if (!res.ok) { console.warn("JSONBin save error:", res.status, await res.text()); }
+    else { console.log("JSONBin saved ✅"); }
+  } catch(e) { console.warn("JSONBin save exception:", e); }
 }
 
 const COLORS = {
