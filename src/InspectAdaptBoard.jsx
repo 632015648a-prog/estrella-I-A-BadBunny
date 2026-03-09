@@ -852,15 +852,36 @@ function Card({card,value,onClick}) {
 
 // ══════════════════════════════════════════════
 export default function InspectAdaptBoard() {
-  const [cardTexts,setCardTexts]=useState(Object.fromEntries(CARD_CONFIG.map(c=>[c.id,c.defaultText])));
-  const [editingCard,setEditingCard]=useState(null);
-  const [piName,setPiName]=useState("PI 6.2");
-  const [editingPI,setEditingPI]=useState(false);
-  const [piInput,setPiInput]=useState("PI 6.2");
-  const [exporting,setExporting]=useState(false);
-  const wrapRef=useRef(null);
+  // ── Inicializar desde localStorage (o valores por defecto) ──
+  const savedTexts = (() => {
+    try { return JSON.parse(localStorage.getItem("bb_cardTexts")) || null; } catch { return null; }
+  })();
+  const savedPI = localStorage.getItem("bb_piName") || "PI 6.2";
 
-  const handleSave=(id,txt)=>{setCardTexts(p=>({...p,[id]:txt}));setEditingCard(null);};
+  const [cardTexts, setCardTexts] = useState(
+    savedTexts || Object.fromEntries(CARD_CONFIG.map(c => [c.id, c.defaultText]))
+  );
+  const [editingCard, setEditingCard] = useState(null);
+  const [piName,      setPiName]      = useState(savedPI);
+  const [editingPI,   setEditingPI]   = useState(false);
+  const [piInput,     setPiInput]     = useState(savedPI);
+  const [exporting,   setExporting]   = useState(false);
+  const wrapRef = useRef(null);
+
+  // ── Guardar tarjeta y persistir ──
+  const handleSave = (id, txt) => {
+    const next = { ...cardTexts, [id]: txt };
+    setCardTexts(next);
+    localStorage.setItem("bb_cardTexts", JSON.stringify(next));
+    setEditingCard(null);
+  };
+
+  // ── Guardar PI y persistir ──
+  const handleSavePI = (name) => {
+    setPiName(name);
+    localStorage.setItem("bb_piName", name);
+    setEditingPI(false);
+  };
 
   const handleExport=async()=>{
     if(exporting)return;setExporting(true);
@@ -949,9 +970,9 @@ export default function InspectAdaptBoard() {
               {editingPI?(
                 <div style={{display:"flex",alignItems:"center",gap:5}}>
                   <input value={piInput} onChange={e=>setPiInput(e.target.value)}
-                    onKeyDown={e=>{if(e.key==="Enter"){setPiName(piInput);setEditingPI(false);}}} autoFocus
+                    onKeyDown={e=>{if(e.key==="Enter") handleSavePI(piInput);}} autoFocus
                     style={{background:"rgba(0,255,135,.07)",border:`1px solid ${COLORS.neon}`,borderRadius:6,color:COLORS.neon,fontFamily:"'Bebas Neue',cursive",fontSize:17,padding:"3px 8px",outline:"none",width:130,letterSpacing:2}}/>
-                  <button onClick={()=>{setPiName(piInput);setEditingPI(false);}} style={{background:COLORS.neon,border:"none",color:"#000",fontFamily:"'Bebas Neue',cursive",fontSize:13,padding:"3px 9px",borderRadius:5,cursor:"pointer"}}>OK</button>
+                  <button onClick={()=>handleSavePI(piInput)} style={{background:COLORS.neon,border:"none",color:"#000",fontFamily:"'Bebas Neue',cursive",fontSize:13,padding:"3px 9px",borderRadius:5,cursor:"pointer"}}>OK</button>
                 </div>
               ):(
                 <div onClick={()=>{setPiInput(piName);setEditingPI(true);}}
